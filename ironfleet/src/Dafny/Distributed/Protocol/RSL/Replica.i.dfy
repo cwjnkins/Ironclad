@@ -283,7 +283,7 @@ predicate LReplicaNextProcessPacketWithoutReadingClock(s:LReplica, s':LReplica, 
 {
   && (forall io :: io in ios[1..] ==> io.LIoOpSend?)
   && var sent_packets := ExtractSentPacketsFromIos(ios);
-    match ios[0].r.msg
+    match ios[0].r.msg {
        case RslMessage_Invalid => LReplicaNextProcessInvalid(s, s', ios[0].r, sent_packets)
        case RslMessage_Request(_, _) => LReplicaNextProcessRequest(s, s', ios[0].r, sent_packets)
        case RslMessage_1a(_) => LReplicaNextProcess1a(s, s', ios[0].r, sent_packets)
@@ -294,6 +294,7 @@ predicate LReplicaNextProcessPacketWithoutReadingClock(s:LReplica, s':LReplica, 
        case RslMessage_Reply(_, _) => LReplicaNextProcessReply(s, s', ios[0].r, sent_packets)
        case RslMessage_AppStateRequest(_, _) => LReplicaNextProcessAppStateRequest(s, s', ios[0].r, sent_packets)
        case RslMessage_AppStateSupply(_, _, _) => LReplicaNextProcessAppStateSupply(s, s', ios[0].r, sent_packets)
+    }
 }
 
 predicate LReplicaNextProcessPacket(s:LReplica, s':LReplica, ios:seq<RslIo>)
