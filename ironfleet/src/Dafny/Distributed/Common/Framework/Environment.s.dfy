@@ -26,11 +26,12 @@ datatype LEnvironment<IdType, MessageType(==)> = LEnvironment(time:int,
                                         
 predicate IsValidLIoOp<IdType, MessageType>(io:LIoOp, actor:IdType, e:LEnvironment<IdType, MessageType>)
 {
-  match io
+  match io {
     case LIoOpSend(s) => s.src == actor
     case LIoOpReceive(r) => r.dst == actor
     case LIoOpTimeoutReceive => true
     case LIoOpReadClock(t) => true
+  }
 }
 
 predicate LIoOpOrderingOKForAction<IdType, MessageType>(
@@ -50,12 +51,13 @@ predicate LIoOpSeqCompatibleWithReduction<IdType, MessageType>(
 
 predicate IsValidLEnvStep<IdType, MessageType>(e:LEnvironment<IdType, MessageType>, step:LEnvStep)
 {
-  match step
+  match step {
     case LEnvStepHostIos(actor, ios) => && (forall io :: io in ios ==> IsValidLIoOp(io, actor, e))
                                         && LIoOpSeqCompatibleWithReduction(ios)
     case LEnvStepDeliverPacket(p) => p in e.sentPackets
     case LEnvStepAdvanceTime => true
     case LEnvStepStutter => true
+  }
 }
 
 predicate LEnvironment_Init<IdType, MessageType>(
@@ -103,11 +105,12 @@ predicate LEnvironment_Next<IdType, MessageType>(
   )
 {
   && IsValidLEnvStep(e, e.nextStep)
-  && match e.nextStep
+  && match e.nextStep {
       case LEnvStepHostIos(actor, ios) => LEnvironment_PerformIos(e, e', actor, ios)
       case LEnvStepDeliverPacket(p) => LEnvironment_Stutter(e, e') // this is only relevant for synchrony
       case LEnvStepAdvanceTime => LEnvironment_AdvanceTime(e, e')
       case LEnvStepStutter => LEnvironment_Stutter(e, e')
+     }
 }
 
 function{:opaque} EnvironmentNextTemporal<IdType,MessageType>(b:Behavior<LEnvironment<IdType, MessageType>>):temporal

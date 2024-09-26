@@ -4,16 +4,18 @@ datatype UpperBound = UpperBoundFinite(n:int) | UpperBoundInfinite()
 
 predicate LeqUpperBound(x:int, u:UpperBound)
 {
-  match u
+  match u {
     case UpperBoundFinite(n) => x <= n
     case UpperBoundInfinite => true
+  }
 }
 
 predicate LtUpperBound(x:int, u:UpperBound)
 {
-  match u
+  match u {
     case UpperBoundFinite(n) => x < n
     case UpperBoundInfinite => true
+  }
 }
     
 function UpperBoundedAddition(x:int, y:int, u:UpperBound):int
